@@ -170,6 +170,9 @@ struct PrinterLog {
 #define ARDUINOTRACE_LOG(line, message) \
   ":" ARDUINOTRACE_STRINGIFY(line) ": " #message
 
+#define ARDUINOTRACE_LOGS(line, variable) \
+  ":" ARDUINOTRACE_STRINGIFY(line) ": " #variable " = "
+
 // Initializes the Serial port
 //
 // Use this macro only if you want to call TRACE() at global scope,
@@ -197,6 +200,9 @@ struct PrinterLog {
 #define LOG(message)                            \
   ARDUINOTRACE_PRINT_LOG(__COUNTER__, __FILE__, \
                          ARDUINOTRACE_LOG(__LINE__, message))
+#define LOGS(variable, message)              \
+  ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
+                     ARDUINOTRACE_LOGS(__LINE__, variable), message)
 
 #else  // ie ARDUINOTRACE_ENABLE == 0
 
@@ -204,5 +210,6 @@ struct PrinterLog {
 #define TRACE()
 #define DUMP(variable)
 #define LOG(message)
+#define LOGS(variable, message)
 
 #endif
