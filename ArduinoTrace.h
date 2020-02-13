@@ -197,19 +197,20 @@ struct PrinterLog {
   ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
                      ARDUINOTRACE_DUMP_PREFIX(__LINE__, variable), variable)
 
+#define DUMPS(variable, message)            \
+  ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
+                     ARDUINOTRACE_DUMP_PREFIX(__LINE__, variable), message)
+
 #define LOG(message)                            \
   ARDUINOTRACE_PRINT_LOG(__COUNTER__, __FILE__, \
                          ARDUINOTRACE_LOG(__LINE__, message))
-#define LOGS(variable, message)              \
-  ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
-                     ARDUINOTRACE_LOGS(__LINE__, variable), message)
 
 #else  // ie ARDUINOTRACE_ENABLE == 0
 
 #define ARDUINOTRACE_INIT(bauds)
 #define TRACE()
 #define DUMP(variable)
+#define DUMPS(variable, message)
 #define LOG(message)
-#define LOGS(variable, message)
 
 #endif
