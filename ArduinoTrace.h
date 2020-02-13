@@ -113,6 +113,16 @@ struct Printer {
     serial.flush();
   }
 };
+
+template <typename TFilename, typename TPrefix>
+struct PrinterLog {
+  template <typename TSerial>
+  PrinterLog(TSerial &serial) {
+    serial.print(make_string<TFilename>{}.data());
+    serial.println(make_string<TPrefix>{}.data());
+    serial.flush();
+  }
+};
 }  // namespace ArduinoTrace
 
 #define ARDUINOTRACE_STRINGIFY(X) #X
@@ -136,6 +146,18 @@ struct Printer {
                                                          content);            \
   }
 
+#define ARDUINOTRACE_PRINT_LOG(id, file, prefix)             \
+  {                                                          \
+    struct __filename {                                      \
+      constexpr static char const *data() { return file; }   \
+    };                                                       \
+    struct __prefix {                                        \
+      constexpr static char const *data() { return prefix; } \
+    };                                                       \
+    ArduinoTrace::PrinterLog<__filename, __prefix> __tracer( \
+        ARDUINOTRACE_SERIAL);                                \
+  }
+
 #define ARDUINOTRACE_INITIALIZE(id, bauds)                          \
   ArduinoTrace::Initializer ARDUINOTRACE_CONCAT(__initializer, id)( \
       ARDUINOTRACE_SERIAL, bauds);
@@ -144,6 +166,9 @@ struct Printer {
 
 #define ARDUINOTRACE_DUMP_PREFIX(line, variable) \
   ":" ARDUINOTRACE_STRINGIFY(line) ": " #variable " = "
+
+#define ARDUINOTRACE_LOG(line, message) \
+  ":" ARDUINOTRACE_STRINGIFY(line) ": " #message
 
 // Initializes the Serial port
 //
@@ -169,10 +194,15 @@ struct Printer {
   ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
                      ARDUINOTRACE_DUMP_PREFIX(__LINE__, variable), variable)
 
+#define LOG(message)                            \
+  ARDUINOTRACE_PRINT_LOG(__COUNTER__, __FILE__, \
+                         ARDUINOTRACE_LOG(__LINE__, message))
+
 #else  // ie ARDUINOTRACE_ENABLE == 0
 
 #define ARDUINOTRACE_INIT(bauds)
 #define TRACE()
 #define DUMP(variable)
+#define LOG(message)
 
 #endif
